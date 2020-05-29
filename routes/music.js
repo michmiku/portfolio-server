@@ -1,14 +1,14 @@
 const router = require('express').Router();
 let Music = require('../models/music.model');
+let MusicMetadata = require('../models/musicMetadata.model');
 const fs = require('fs')
 const path = require('path')
 const mm = require('music-metadata');
 const util = require('util');
 
+
 router.route('/').get((req, res) => {
     fs.readdir(__dirname + '/../music', function (err, files) {
-        const music = []
-        var count = 0
         if (err) {
             return console.log(err);
         }
@@ -25,22 +25,27 @@ router.route('/').get((req, res) => {
                         minutes = '0' + minutes
                     }
                     duration = minutes + ':' + seconds
-                    music.push({ file: filename, title: metadata.common.title, artist: metadata.common.artist, duration: duration, rawDuration: metadata.format.duration })
-                    count++
-                    if (count == files.length) {
-                        res.json(music)
-                    }
+                    MusicMetadata.find({ file: filename })
+                        .then(music => {
+                            if (music.length === 0) {
+                                const newMusicMetadata = new MusicMetadata({ file: filename, title: metadata.common.title, artist: metadata.common.artist, duration: duration, rawDuration: metadata.format.duration });
+                                newMusicMetadata.save()
+                            }
+                        })
+                        .catch(err => res.status(400).json('Error: ' + err));
                 })
                 .catch(err => {
                     console.error(err.message);
                 });
-
-
         });
-
-
     });
-
+});
+router.route('/getlist').get((req, res) => {
+    MusicMetadata.find()
+        .then(music => {
+            res.json(music)
+        })
+        .catch(err => res.status(400).json('Error: ' + err));
 });
 router.route('/list').get((req, res) => {
     fs.readdir(__dirname + '/../music', function (err, files) {
