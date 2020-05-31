@@ -45,7 +45,7 @@ router.route('/getlist').get((req, res) => {
         .then(music => {
             res.json(music)
         })
-        .catch(err => res.status(400).json('Error: ' + err));
+        .catch(err => res.status(400).json('Error: ' + err))
 });
 router.route('/list').get((req, res) => {
     fs.readdir(__dirname + '/../music', function (err, files) {
