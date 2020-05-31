@@ -1,5 +1,7 @@
 const router = require('express').Router();
 let User = require('../models/user.model');
+const bcrypt = require('bcrypt')
+const saltRounds = 10
 
 router.route('/').get((req, res) => {
   User.find()
@@ -8,29 +10,32 @@ router.route('/').get((req, res) => {
 });
 
 router.route('/add').post((req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
-  const newUser = new User({ username, password });
 
-  newUser.save()
-    .then(() => res.json('User added!'))
-    .catch(err => {
-      res.status(400).json('Error: ' + err)
-    });
+  bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
+    if (err) throw err;
+    const username = req.body.username;
+    const password = hash;
+    const newUser = new User({ username, password });
+
+    newUser.save()
+      .then(() => res.json('User added!'))
+      .catch(err => {
+        res.status(400).json('Error: ' + err)
+      })
+  });
 });
 router.route('/login').post((req, res) => {
-  User.find({ username: req.body.username })
-    .then(users => {
-      if (users.length == 0 || req.body.password != users[0].password) {
-        console.log("Wrong username or password!")
-        res.json('')
-      }
-      else {
-        res.json(users)
-        console.log("success")
-      }
-    })
-    .catch(err => res.status(400).json('Error: ' + err));
+  User.findOne({ username: req.body.username }, (err, user) => {
+    if (err) res.json({ err: "Wrong username or password!" })
+    if (user) {
+      bcrypt.compare(req.body.password, user.password, (err, result) => {
+        if (!result) res.json('')
+        else res.json(user)
+      })
+    } else {
+      res.json('')
+    }
+  })
 })
 router.route('/updateAdmin').post((req, res) => {
   User.findById(req.body._id)
@@ -49,11 +54,15 @@ router.route('/updatePassword').post((req, res) => {
   console.log(req.body)
   User.findById(req.body.user._id)
     .then(user => {
-      user.username = req.body.user.username
-      user.password = req.body.password
-      user.save()
-        .then(() => res.json("User updated!"))
-        .catch(err => res.status(400).json('Error: ' + err));
+      bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
+        if (err) throw err;
+        user.username = req.body.user.username
+        user.password = hash
+        user.save()
+          .then(() => res.json("User updated!"))
+          .catch(err => res.status(400).json('Error: ' + err));
+      });
+
     })
 
 })
