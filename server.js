@@ -25,5 +25,5 @@ app.use('/users', usersRouter);
 app.use('/music', musicLibrary)
 
 app.listen(port, () => {
-  console.log(`Server is aarunning on port: ${port}`);
+  console.log(`Server is running on port: ${port}`);
 });
