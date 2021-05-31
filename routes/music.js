@@ -91,7 +91,7 @@ router.route("/getlist").get((req, res) => {
     .catch((err) => res.status(400).json("Error: " + err));
 });
 router.route("/get-list-macu").get((req, res) => {
-  MusicMetadata.find()
+  MusicMetadataMacu.find()
     .then((music) => {
       res.json(music);
     })
