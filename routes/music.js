@@ -68,7 +68,10 @@ router.route("/").get((req, res) => {
                 const newMusicMetadataMacu = new MusicMetadataMacu({
                   file: filename,
                   title: metadata.common.title,
-                  artist: metadata.common.artist,
+                  artist: metadata.common.artist
+                    ? metadata.common.artist
+                    : "Macu",
+                  genre: metadata.common.genre,
                   duration: duration,
                   rawDuration: metadata.format.duration,
                 });
