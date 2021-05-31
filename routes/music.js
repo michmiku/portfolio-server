@@ -164,5 +164,19 @@ router.route("/*.ogg").get((req, res) => {
     }
   );
 });
+router.route("/file/*.ogg").get((req, res) => {
+  fs.readFile(
+    __dirname + "/../music-macu" + decodeURI(req.url),
+    function (err, data) {
+      if (!err) {
+        res.writeHead(200, { "Content-Type": "audio/mpeg" });
+        res.write(data);
+        res.end();
+      } else {
+        console.log(err);
+      }
+    }
+  );
+});
 
 module.exports = router;
