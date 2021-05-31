@@ -8,6 +8,7 @@ const mm = require("music-metadata");
 const util = require("util");
 
 router.route("/").get((req, res) => {
+  console.log("!");
   fs.readdir(__dirname + "/../music", function (err, files) {
     if (err) {
       return console.log(err);
@@ -64,6 +65,7 @@ router.route("/").get((req, res) => {
           duration = minutes + ":" + seconds;
           MusicMetadataMacu.find({ file: filename })
             .then((music) => {
+              console.log(metadata);
               if (music.length === 0) {
                 const newMusicMetadataMacu = new MusicMetadataMacu({
                   file: filename,
@@ -71,7 +73,7 @@ router.route("/").get((req, res) => {
                   artist: metadata.common.artist
                     ? metadata.common.artist
                     : "Macu",
-                  genre: metadata.common.genre,
+                  genre: metadata.common.genre[0],
                   duration: duration,
                   rawDuration: metadata.format.duration,
                 });
