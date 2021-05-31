@@ -149,10 +149,9 @@ router.route("/delete").post((req, res) => {
     .then(() => res.json("User deleted!"))
     .catch((err) => res.status(400).json("Error: " + err));
 });
-
-router.route("/*.ogg").get((req, res) => {
+router.route("/file/*.ogg").get((req, res) => {
   fs.readFile(
-    __dirname + "/../music" + decodeURI(req.url),
+    __dirname + "/../music-macu/" + decodeURI(req.url).split("/")[2],
     function (err, data) {
       if (!err) {
         res.writeHead(200, { "Content-Type": "audio/mpeg" });
@@ -164,9 +163,9 @@ router.route("/*.ogg").get((req, res) => {
     }
   );
 });
-router.route("/file/*.ogg").get((req, res) => {
+router.route("/*.ogg").get((req, res) => {
   fs.readFile(
-    __dirname + "/../music-macu" + decodeURI(req.url),
+    __dirname + "/../music" + decodeURI(req.url),
     function (err, data) {
       if (!err) {
         res.writeHead(200, { "Content-Type": "audio/mpeg" });
