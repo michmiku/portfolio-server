@@ -152,9 +152,23 @@ router.route("/delete").post((req, res) => {
 router.route("/file/*.mp3").get((req, res) => {
   fs.readFile(
     __dirname + "/../music-macu/" + decodeURI(req.url).split("/")[2],
+
     function (err, data) {
       if (!err) {
-        res.writeHead(200, { "Content-Type": "audio/mpeg" });
+        let duration;
+        mm.parseFile(
+          __dirname + "/../music-macu/" + decodeURI(req.url).split("/")[2]
+        )
+          .then((metadata) => {
+            duration = metadata.format.duration;
+          })
+          .catch((err) => {
+            console.error(err.message);
+          });
+        res.writeHead(200, {
+          "Content-Type": "audio/mpeg",
+          "Content-Length": duration,
+        });
         res.write(data);
         res.end();
       } else {
