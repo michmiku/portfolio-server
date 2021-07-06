@@ -164,7 +164,6 @@ router.route("/file/*.mp3").get((req, res) => {
             console.log(duration);
             res.writeHead(200, {
               "Content-Type": "audio/mpeg",
-              "Content-Length": duration,
               "Accept-Ranges": "bytes 0-" + duration,
               Connection: "keep-alive",
             });
