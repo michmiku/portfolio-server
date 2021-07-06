@@ -149,7 +149,7 @@ router.route("/delete").post((req, res) => {
     .then(() => res.json("User deleted!"))
     .catch((err) => res.status(400).json("Error: " + err));
 });
-router.route("/file/*.ogg").get((req, res) => {
+router.route("/file/*.mp3").get((req, res) => {
   fs.readFile(
     __dirname + "/../music-macu/" + decodeURI(req.url).split("/")[2],
     function (err, data) {
