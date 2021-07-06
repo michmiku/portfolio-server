@@ -182,7 +182,7 @@ router.route("/*.ogg").get((req, res) => {
     __dirname + "/../music" + decodeURI(req.url),
     function (err, data) {
       if (!err) {
-        res.writeHead(200, { "Content-Type": "audio/mpeg" });
+        res.writeHead(200, { "Content-Type": "audio/ogg" });
         res.write(data);
         res.end();
       } else {
