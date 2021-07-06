@@ -155,22 +155,23 @@ router.route("/file/*.mp3").get((req, res) => {
 
     function (err, data) {
       if (!err) {
-        let duration;
         mm.parseFile(
           __dirname + "/../music-macu/" + decodeURI(req.url).split("/")[2]
         )
           .then((metadata) => {
-            duration = metadata.format.duration;
+            let duration = metadata.format.duration;
+            console.log(metadata.format);
+            console.log(duration);
+            res.writeHead(200, {
+              "Content-Type": "audio/mpeg",
+              "Content-Length": metadata.format.duration,
+            });
+            res.write(data);
+            res.end();
           })
           .catch((err) => {
             console.error(err.message);
           });
-        res.writeHead(200, {
-          "Content-Type": "audio/mpeg",
-          "Content-Length": duration,
-        });
-        res.write(data);
-        res.end();
       } else {
         console.log(err);
       }
