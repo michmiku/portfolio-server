@@ -178,6 +178,15 @@ router.route("/list-macu").get((req, res) => {
     res.end();
   });
 });
+router.route("/list-macu-ogg").get((req, res) => {
+  fs.readdir(__dirname + "/../music-macu-ogg", function (err, files) {
+    files.forEach(function (filename, key) {
+      res.write('<a href= "' + filename + '">' + filename + "</a><br>");
+      res.write("\n\n");
+    });
+    res.end();
+  });
+});
 
 router.route("/add").post((req, res) => {
   const username = req.body.authUser.username;
