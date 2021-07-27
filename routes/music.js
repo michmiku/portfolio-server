@@ -2,6 +2,7 @@ const router = require("express").Router();
 let Music = require("../models/music.model");
 let MusicMetadata = require("../models/musicMetadata.model");
 let MusicMetadataMacu = require("../models/musicMetadataMacu.model");
+let MusicMetadataMacuOgg = require("../models/MusicMetadataMacuOgg.model");
 const fs = require("fs");
 const path = require("path");
 const mm = require("music-metadata");
@@ -65,19 +66,68 @@ router.route("/").get((req, res) => {
           duration = minutes + ":" + seconds;
           MusicMetadataMacu.find({ file: filename })
             .then((music) => {
-              console.log(metadata);
+              console.log(filename, "---------------------", metadata);
               if (music.length === 0) {
                 const newMusicMetadataMacu = new MusicMetadataMacu({
                   file: filename,
-                  title: metadata.common.title,
+                  title: metadata.common.title
+                    ? metadata.common.title
+                    : `${filename})`.split(".")[0],
                   artist: metadata.common.artist
                     ? metadata.common.artist
                     : "Macu",
-                  genre: metadata.common.genre[0],
+                  genre: metadata.common.genre?.[0]
+                    ? metadata.common.genre?.[0]
+                    : "Rock",
                   duration: duration,
                   rawDuration: metadata.format.duration,
                 });
                 newMusicMetadataMacu.save();
+              }
+            })
+            .catch((err) => res.status(400).json("Error: " + err));
+        })
+        .catch((err) => {
+          console.error(err.message);
+        });
+    });
+  });
+  fs.readdir(__dirname + "/../music-macu-ogg", function (err, files) {
+    if (err) {
+      return console.log(err);
+    }
+    files.forEach(function (filename, key) {
+      mm.parseFile(__dirname + "/../music-macu-ogg/" + filename)
+        .then((metadata) => {
+          let duration = metadata.format.duration;
+          let minutes = Math.floor(duration / 60);
+          let seconds = Math.floor(duration - minutes * 60);
+          if (seconds < 10) {
+            seconds = "0" + seconds;
+          }
+          if (minutes < 10) {
+            minutes = "0" + minutes;
+          }
+          duration = minutes + ":" + seconds;
+          MusicMetadataMacuOgg.find({ file: filename })
+            .then((music) => {
+              console.log(filename, "---------------------", metadata);
+              if (music.length === 0) {
+                const newMusicMetadataMacuOgg = new MusicMetadataMacuOgg({
+                  file: filename,
+                  title: metadata.common.title
+                    ? metadata.common.title
+                    : `${filename})`.split(".")[0],
+                  artist: metadata.common.artist
+                    ? metadata.common.artist
+                    : "Macu",
+                  genre: metadata.common.genre?.[0]
+                    ? metadata.common.genre?.[0]
+                    : "Rock",
+                  duration: duration,
+                  rawDuration: metadata.format.duration,
+                });
+                newMusicMetadataMacuOgg.save();
               }
             })
             .catch((err) => res.status(400).json("Error: " + err));
@@ -97,6 +147,13 @@ router.route("/getlist").get((req, res) => {
 });
 router.route("/get-list-macu").get((req, res) => {
   MusicMetadataMacu.find()
+    .then((music) => {
+      res.json(music);
+    })
+    .catch((err) => res.status(400).json("Error: " + err));
+});
+router.route("/get-list-macu-ogg").get((req, res) => {
+  MusicMetadataMacuOgg.find()
     .then((music) => {
       res.json(music);
     })
@@ -157,6 +214,36 @@ router.route("/file/*.mp3").get((req, res) => {
       if (!err) {
         mm.parseFile(
           __dirname + "/../music-macu/" + decodeURI(req.url).split("/")[2]
+        )
+          .then((metadata) => {
+            let duration = metadata.format.duration;
+            console.log(metadata.format);
+            console.log(duration);
+            res.writeHead(200, {
+              "Content-Type": "audio/mpeg",
+              "Accept-Ranges": "bytes",
+              Connection: "keep-alive",
+            });
+            res.write(data);
+            res.end();
+          })
+          .catch((err) => {
+            console.error(err.message);
+          });
+      } else {
+        console.log(err);
+      }
+    }
+  );
+});
+router.route("/file-ogg/*.ogg").get((req, res) => {
+  fs.readFile(
+    __dirname + "/../music-macu-ogg/" + decodeURI(req.url).split("/")[2],
+
+    function (err, data) {
+      if (!err) {
+        mm.parseFile(
+          __dirname + "/../music-macu-ogg/" + decodeURI(req.url).split("/")[2]
         )
           .then((metadata) => {
             let duration = metadata.format.duration;

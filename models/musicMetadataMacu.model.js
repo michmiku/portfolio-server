@@ -21,7 +21,7 @@ const musicMetadataSchema = new Schema(
     },
     genre: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     duration: {
