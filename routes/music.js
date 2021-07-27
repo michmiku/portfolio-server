@@ -259,7 +259,7 @@ router.route("/file-ogg/*.ogg").get((req, res) => {
             console.log(metadata.format);
             console.log(duration);
             res.writeHead(200, {
-              "Content-Type": "audio/mpeg",
+              "Content-Type": "audio/ogg",
               "Accept-Ranges": "bytes",
               Connection: "keep-alive",
             });
