@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const musicMetadataOggSchema = new Schema(
+const musicMetadataSchema = new Schema(
   {
     file: {
       type: String,
@@ -40,9 +40,9 @@ const musicMetadataOggSchema = new Schema(
   }
 );
 
-const MusicMetadataOgg = mongoose.model(
+const MusicMetadata = mongoose.model(
   "MusicMetadataMacuOgg",
-  musicMetadataOggSchema
+  musicMetadataSchema
 );
 
-module.exports = MusicMetadataOgg;
+module.exports = MusicMetadata;
